@@ -1,42 +1,43 @@
-import { Button, Icon, Input, Text, Layout, withStyles } from '@ui-kitten/components';
-import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import {Button, Icon, Input} from '@ui-kitten/components';
+import React, {useState} from 'react';
+import {StyleSheet, View} from 'react-native';
+import {useDispatch} from 'react-redux';
 
 const PlayerList = () => {
-    const [playerNames, setInputs] = useState([{ key: '', value: '' }]);
+    const dispatch = useDispatch();
+
+    const [inputs, setInputs] = useState([{key: '', value: ''}]);
 
     const DeletePlayerIcon = (props) => (
-        <Icon {...props} name='person-delete-outline' />
+        <Icon {...props} name='person-delete-outline'/>
     );
 
     const addHandler = () => {
-        const _inputs = [...playerNames];
-        _inputs.push({ key: '', value: '' });
+        const _inputs = [...inputs];
+        _inputs.push({key: _inputs.length.toString(), value: ''});
+        dispatch({type: 'NEW_PLAYER'});
         setInputs(_inputs);
     }
 
     const deleteHandler = (key) => {
-        const _inputs = playerNames
-        .filter((input, index) => index != key);
+        const _inputs = inputs.filter((_input, index) => index !== key);
+        dispatch({ type: 'DELETE_PLAYER', index: key });
         setInputs(_inputs);
     }
 
     const inputHandler = (text, key) => {
-        const _inputs = [...playerNames
-        ];
+        const _inputs = [...inputs];
         _inputs[key].value = text;
         _inputs[key].key = key;
-        console.log(_inputs);
+        dispatch({ type: 'UPDATE_PLAYER', index: key, payload: text });
         setInputs(_inputs);
     }
 
     return (
         <View>
-            {playerNames
-            .map((input, key) => (
-                <View style={styles.inputContainer}>
+            {inputs.map((input, key) => (
+                <View style={styles.inputContainer} key={key}>
                     <Input
-                        key={key}
                         style={styles.input}
                         value={input.value}
                         placeholder='Player name'
@@ -52,7 +53,7 @@ const PlayerList = () => {
                 </View>
             ))}
             <Button style={styles.button}
-                title="Add" onPress={addHandler} />
+                title="Add" onPress={addHandler} >Add</Button>
         </View>
     );
 }

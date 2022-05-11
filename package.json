@@ -15,6 +15,7 @@
     "@react-navigation/bottom-tabs": "^6.3.1",
     "@react-navigation/native": "^6.0.10",
     "@react-navigation/stack": "^6.2.1",
+    "@reduxjs/toolkit": "^1.8.1",
     "@ui-kitten/components": "^5.1.2",
     "@ui-kitten/eva-icons": "^5.1.2",
     "expo": "~45.0.0",
@@ -23,9 +24,11 @@
     "react-dom": "17.0.2",
     "react-native": "0.68.1",
     "react-native-dynamic-forms": "^1.0.39",
-    "react-native-gesture-handler": "~2.2.0",
+    "react-native-gesture-handler": "~2.2.1",
     "react-native-web": "0.17.7",
     "react-redux": "^8.0.1",
+    "redux-persist": "^6.0.0",
+    "redux-state-sync": "^3.1.2",
     "webpack-dev-server": "~3.11.0"
   },
   "devDependencies": {

@@ -1,28 +1,26 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { BottomNavigation, BottomNavigationTab, Layout, Text } from '@ui-kitten/components';
+import {NavigationContainer} from '@react-navigation/native';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {BottomNavigation, BottomNavigationTab} from '@ui-kitten/components';
 import PlayerList from './playerlist.component';
+import LineupComponent from './lineup.component';
 
-const { Navigator, Screen } = createBottomTabNavigator();
 
-const PlayersScreen = () => (
-  <PlayerList />
-);
+const {Navigator, Screen} = createBottomTabNavigator();
 
-const LineupScreen = () => (
-  <Layout style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <Text category='h1'>lineup</Text>
-  </Layout>
+const PlayersScreen = (PlayerList);
+
+const LineupScreen = (
+    LineupComponent
 );
 
 const BottomTabBar = ({ navigation, state }) => (
-  <BottomNavigation
-    selectedIndex={state.index}
-    onSelect={index => navigation.navigate(state.routeNames[index])}>
-    <BottomNavigationTab title='LINEUP' />
-    <BottomNavigationTab title='PLAYERS' />
-  </BottomNavigation>
+    <BottomNavigation
+        selectedIndex={state.index}
+        onSelect={index => navigation.navigate(state.routeNames[index])}>
+        <BottomNavigationTab title='LINEUP'/>
+        <BottomNavigationTab title='PLAYERS'/>
+    </BottomNavigation>
 );
 
 const TabNavigator = () => (
