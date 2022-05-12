@@ -1,9 +1,9 @@
-const initialState = []
+const initialState = ['Alfa', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf']
 
 const player = (state = initialState, action) => {
     switch (action.type) {
         case 'NEW_PLAYER':
-            return [...state, action.payload]
+            return [...state, '']
         case 'UPDATE_PLAYER':
             return [
                 ...state.slice(0, action.index),

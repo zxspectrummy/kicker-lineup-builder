@@ -1,47 +1,48 @@
-import {Button, Icon, Input} from '@ui-kitten/components';
-import React, {useState} from 'react';
+import {Button, Card, Icon, Input, Toggle} from '@ui-kitten/components';
+import React from 'react';
 import {StyleSheet, View} from 'react-native';
-import {useDispatch} from 'react-redux';
+import {connect, useDispatch} from 'react-redux';
 
-const PlayerList = () => {
+const mapStateToProps = (state) => {
+    return {
+        players: state.players
+    }
+}
+
+const PlayerList = (props) => {
     const dispatch = useDispatch();
-
-    const [inputs, setInputs] = useState([{key: '', value: ''}]);
 
     const DeletePlayerIcon = (props) => (
         <Icon {...props} name='person-delete-outline'/>
     );
 
     const addHandler = () => {
-        const _inputs = [...inputs];
-        _inputs.push({key: _inputs.length.toString(), value: ''});
         dispatch({type: 'NEW_PLAYER'});
-        setInputs(_inputs);
     }
 
     const deleteHandler = (key) => {
-        const _inputs = inputs.filter((_input, index) => index !== key);
-        dispatch({ type: 'DELETE_PLAYER', index: key });
-        setInputs(_inputs);
+        dispatch({type: 'DELETE_PLAYER', index: key});
     }
 
-    const inputHandler = (text, key) => {
-        const _inputs = [...inputs];
-        _inputs[key].value = text;
-        _inputs[key].key = key;
-        dispatch({ type: 'UPDATE_PLAYER', index: key, payload: text });
-        setInputs(_inputs);
+    const inputHandler = (name, key) => {
+        dispatch({type: 'UPDATE_PLAYER', index: key, payload: name});
     }
+    const [activeChecked, setActiveChecked] = React.useState(false);
 
     return (
-        <View>
-            {inputs.map((input, key) => (
+        <Card>
+            {props.players.map((name, key) => (
                 <View style={styles.inputContainer} key={key}>
+                    <Toggle
+                        style={styles.toggle}
+                        checked={activeChecked}
+                        onChange={setActiveChecked}>
+                    </Toggle>
                     <Input
                         style={styles.input}
-                        value={input.value}
+                        value={name}
                         placeholder='Player name'
-                        onChangeText={(text) => inputHandler(text, key)}
+                        onChangeText={(changedName) => inputHandler(changedName, key)}
                     />
                     <Button
                         style={styles.button}
@@ -52,9 +53,8 @@ const PlayerList = () => {
                     />
                 </View>
             ))}
-            <Button style={styles.button}
-                title="Add" onPress={addHandler} >Add</Button>
-        </View>
+            <Button style={styles.button} title="Add" onPress={addHandler}>Add</Button>
+        </Card>
     );
 }
 
@@ -83,4 +83,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default PlayerList;
+export default connect(mapStateToProps)(PlayerList);
