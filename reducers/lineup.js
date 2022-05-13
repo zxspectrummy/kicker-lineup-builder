@@ -14,7 +14,6 @@ const lineup = (state = initialState, action) => {
                 [action.team]: action.payload,
             }
         case 'UPDATE_ACTIVE_PLAYERS':
-            console.log(action);
             return {
                 ...state,
                 singles: state.singles.filter((id) => id !== action.index),

@@ -35,8 +35,6 @@ const PlayerList = (props) => {
             index: key,
             payload: isActive
         })
-        console.log('bla')
-
         if (isActive === false) {
             dispatch({
                 type: 'UPDATE_ACTIVE_PLAYERS',

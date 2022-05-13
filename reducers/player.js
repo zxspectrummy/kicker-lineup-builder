@@ -1,3 +1,4 @@
+import 'react-native-get-random-values';
 import {v4 as uuidv4} from 'uuid';
 
 const playerFromName = (name) => {
@@ -21,6 +22,12 @@ const player = (state = initialState, action) => {
 
         case 'UPDATE_PLAYER_STATE':
             return state.map((player) => player.id === action.index ? {...player, isActive: action.payload} : player)
+
+        case 'UPDATE_PLAYER_GAMES_PLAYED':
+            return state.map((player) => player.id === action.index ? {
+                ...player,
+                gamesPlayed: player.gamesPlayed + action.payload
+            } : player)
 
         case 'DELETE_PLAYER':
             return [...state.filter((player) => player.id !== action.index)]
