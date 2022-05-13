@@ -40,16 +40,18 @@ const TeamPicker = (props) => {
         multiSelect={true}
         selectedIndex={selectedIndex}
         onSelect={(selectedIndex) => {
-            dispatch({
-                type: 'UPDATE_TEAM',
-                team: props.teamKey,
-                payload: selectedIndexToPlayerIds(selectedIndex)
-            })
-            dispatch({
-                type: 'UPDATE_PLAYER_GAMES_PLAYED',
-                index: lastSelectedPlayerId(selectedIndex, props.team),
-                payload: selectedIndex.length - props.team.length
-            })
+            if ((props.team.length < 2) || (selectedIndex.length < props.team.length)) {
+                dispatch({
+                    type: 'UPDATE_TEAM',
+                    team: props.teamKey,
+                    payload: selectedIndexToPlayerIds(selectedIndex)
+                })
+                dispatch({
+                    type: 'UPDATE_PLAYER_GAMES_PLAYED',
+                    index: lastSelectedPlayerId(selectedIndex, props.team),
+                    payload: selectedIndex.length - props.team.length
+                })
+            }
         }}
         value={commaSeparatedPlayerList()}
     >
