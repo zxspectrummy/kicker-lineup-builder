@@ -1,8 +1,6 @@
-import {useState} from 'react';
 import {StyleSheet, View} from 'react-native';
-import {useSelector} from 'react-redux';
-import Lineup from "../services/lineup";
-import {Card, Select, SelectItem, Text} from '@ui-kitten/components';
+import {connect, useDispatch} from 'react-redux';
+import {Card, IndexPath, Select, SelectItem, Text} from '@ui-kitten/components';
 import * as PropTypes from "prop-types";
 
 const renderOption = (props) => {
@@ -18,7 +16,8 @@ const renderOption = (props) => {
 
 const TeamPicker = (props) => {
     const commaSeparatedPlayerList = () => {
-        return props.selectedIndex.map(index => props.players[index.row].name).sort().join(', ');
+        console.log(props.selectedIndex)
+        return props.selectedIndex.filter(index => index.row >= 0).map(index => props.players[index.row].name).sort().join(', ');
     }
     return <Select
         placeholder={props.label}
@@ -48,59 +47,96 @@ TeamPicker.propTypes = {
         )),
     label: PropTypes.string,
 };
-const LineupComponent = () => {
-    const players = useSelector(store => store.players.filter(player => player.isActive));
-    const lineup = new Lineup(players);
-    const teams = lineup.getAllPairs();
-    const [singlesIndex, setSinglesIndex] = useState([]);
-    const [doubles1Index, setDoubles1Index] = useState([]);
-    const [doubles2Index, setDoubles2Index] = useState([]);
-    const [doubles3Index, setDoubles3Index] = useState([]);
-    const [doubles4Index, setDoubles4Index] = useState([]);
-    const [doubles5Index, setDoubles5Index] = useState([]);
 
+const mapStateToProps = (state) => {
+    return {
+        lineup: state.lineup,
+        players: state.players.filter(player => player.isActive)
+    }
+}
+const LineupComponent = (props) => {
+    const dispatch = useDispatch();
+
+    console.log(props);
+
+    const rowsToPlayerIds = (indexPath) => {
+        return indexPath.map(index => props.players[index.row].id);
+    }
+    const playerIdsToSelectedIndex = (playerIds) => {
+        return playerIds.map(id => props.players.map(item => item.id).indexOf(id))
+            .map(index => new IndexPath(index));
+    }
     return (
         <View style={[styles.container]}>
             <Card>
-                <TeamPicker selectedIndex={singlesIndex}
-                            onSelect={index => setSinglesIndex(index)}
-                            players={players}
+                <TeamPicker selectedIndex={playerIdsToSelectedIndex(props.lineup.singles)}
+                            onSelect={(selectedIndex) => {
+                                dispatch({
+                                    type: 'UPDATE_TEAM',
+                                    team: 'singles',
+                                    payload: rowsToPlayerIds(selectedIndex)
+                                })
+                            }}
+                            players={props.players}
                             label='Einzel 1, Einzel 2'/>
             </Card>
             <Card>
-                <TeamPicker selectedIndex={doubles1Index}
-                            onSelect={index => setDoubles1Index(index)}
-                            players={players}
+                <TeamPicker selectedIndex={playerIdsToSelectedIndex(props.lineup.doubles1)}
+                            onSelect={(selectedIndex) => {
+                                dispatch({
+                                    type: 'UPDATE_TEAM',
+                                    team: 'doubles1',
+                                    payload: rowsToPlayerIds(selectedIndex)
+                                })
+                            }}
+                            players={props.players}
                             label='Doppel 1 (D1)'/>
-                <TeamPicker selectedIndex={doubles2Index}
-                            onSelect={index => setDoubles2Index(index)}
-                            players={players}
+                <TeamPicker selectedIndex={playerIdsToSelectedIndex(props.lineup.doubles2)}
+                            onSelect={(selectedIndex) => {
+                                dispatch({
+                                    type: 'UPDATE_TEAM',
+                                    team: 'doubles2',
+                                    payload: rowsToPlayerIds(selectedIndex)
+                                })
+                            }}
+                            players={props.players}
                             label='Doppel 2 (D2)'/>
             </Card>
             <Card>
-                <TeamPicker selectedIndex={doubles3Index}
-                            onSelect={index => setDoubles3Index(index)}
-                    //players={players.filter((_, i) => !doubles4Index.map(i => i.row).includes(i))}
-                            players={players}
-                            label='Doppel 3 (D3)'/>
-                <TeamPicker selectedIndex={doubles4Index}
-                            onSelect={(index) => {
-                                setDoubles4Index(index)
+                <TeamPicker selectedIndex={playerIdsToSelectedIndex(props.lineup.doubles3)}
+                            onSelect={(selectedIndex) => {
+                                dispatch({
+                                    type: 'UPDATE_TEAM',
+                                    team: 'doubles3',
+                                    payload: rowsToPlayerIds(selectedIndex)
+                                })
                             }}
-                            players={players}
+                    //players={players.filter((_, i) => !doubles4Index.map(i => i.row).includes(i))}
+                            players={props.players}
+                            label='Doppel 3 (D3)'/>
+                <TeamPicker selectedIndex={playerIdsToSelectedIndex(props.lineup.doubles4)}
+                            onSelect={(selectedIndex) => {
+                                dispatch({
+                                    type: 'UPDATE_TEAM',
+                                    team: 'doubles4',
+                                    payload: rowsToPlayerIds(selectedIndex)
+                                })
+                            }}
+                            players={props.players}
                             label='Doppel 4 (D4)'/>
             </Card>
             <Card style={styles.teamGroup}>
-                <TeamPicker selectedIndex={doubles5Index}
-                            onSelect={
-                                index => setDoubles5Index(index)
-                            }
-                            players={players}
+                <TeamPicker selectedIndex={playerIdsToSelectedIndex(props.lineup.doubles5)}
+                            onSelect={(selectedIndex) => {
+                                dispatch({
+                                    type: 'UPDATE_TEAM',
+                                    team: 'doubles5',
+                                    payload: rowsToPlayerIds(selectedIndex)
+                                })
+                            }}
+                            players={props.players}
                             label='Doppel 5 (D5)'/>
             </Card>
-            {/*<View style={{flex: 1}}>*/}
-            {/*    <Text>{teams.toString()}</Text>*/}
-            {/*</View>*/}
         </View>
     );
 }
@@ -124,4 +160,4 @@ const styles = StyleSheet.create({
         color: "lightgray"
     }
 });
-export default LineupComponent;
+export default connect(mapStateToProps)(LineupComponent);

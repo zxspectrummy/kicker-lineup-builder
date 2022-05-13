@@ -29,6 +29,21 @@ const PlayerList = (props) => {
         dispatch({type: 'UPDATE_PLAYER_NAME', index: key, payload: name});
     }
 
+    const stateHandler = (isActive, key) => {
+        dispatch({
+            type: 'UPDATE_PLAYER_STATE',
+            index: key,
+            payload: isActive
+        })
+        console.log('bla')
+
+        if (isActive === false) {
+            dispatch({
+                type: 'UPDATE_ACTIVE_PLAYERS',
+                index: key
+            })
+        }
+    }
     return (
         <Card>
             {props.players.map((player) => (
@@ -36,11 +51,7 @@ const PlayerList = (props) => {
                     <Toggle
                         style={styles.toggle}
                         checked={player.isActive}
-                        onChange={(isActive) => dispatch({
-                            type: 'UPDATE_PLAYER_STATE',
-                            index: player.id,
-                            payload: isActive
-                        })}
+                        onChange={(isActive) => stateHandler(isActive, player.id)}
                     />
                     <Input
                         style={styles.input}

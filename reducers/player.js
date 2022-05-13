@@ -9,13 +9,13 @@ const playerFromName = (name) => {
     }
 }
 const defaultNames = ['Alfa', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf']
-const playersById = defaultNames.map(name => playerFromName(name));
-const initialState = playersById;
+const initialState = defaultNames.map(name => playerFromName(name));
 
 const player = (state = initialState, action) => {
     switch (action.type) {
         case 'NEW_PLAYER':
             return [...state, playerFromName('')]
+
         case 'UPDATE_PLAYER_NAME':
             return state.map((player) => player.id === action.index ? {...player, name: action.payload} : player)
 
