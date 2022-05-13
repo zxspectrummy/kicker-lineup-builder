@@ -2,6 +2,7 @@ import {Button, Card, Icon, Input, Toggle} from '@ui-kitten/components';
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import {connect, useDispatch} from 'react-redux';
+import * as PropTypes from "prop-types";
 
 const mapStateToProps = (state) => {
     return {
@@ -25,29 +26,32 @@ const PlayerList = (props) => {
     }
 
     const inputHandler = (name, key) => {
-        dispatch({type: 'UPDATE_PLAYER', index: key, payload: name});
+        dispatch({type: 'UPDATE_PLAYER_NAME', index: key, payload: name});
     }
-    const [activeChecked, setActiveChecked] = React.useState(false);
 
     return (
         <Card>
-            {props.players.map((name, key) => (
-                <View style={styles.inputContainer} key={key}>
+            {props.players.map((player) => (
+                <View style={styles.inputContainer} key={player.id}>
                     <Toggle
                         style={styles.toggle}
-                        checked={activeChecked}
-                        onChange={setActiveChecked}>
-                    </Toggle>
+                        checked={player.isActive}
+                        onChange={(isActive) => dispatch({
+                            type: 'UPDATE_PLAYER_STATE',
+                            index: player.id,
+                            payload: isActive
+                        })}
+                    />
                     <Input
                         style={styles.input}
-                        value={name}
+                        value={player.name}
                         placeholder='Player name'
-                        onChangeText={(changedName) => inputHandler(changedName, key)}
+                        onChangeText={(changedName) => inputHandler(changedName, player.id)}
                     />
                     <Button
                         style={styles.button}
                         appearance='ghost'
-                        onPress={() => deleteHandler(key)}
+                        onPress={() => deleteHandler(player.id)}
                         accessoryLeft={DeletePlayerIcon}
                         status='danger'
                     />
@@ -82,5 +86,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 });
+
+PlayerList.propTypes = {
+    players: PropTypes.arrayOf(
+        PropTypes.shape({
+                id: PropTypes.string,
+                name: PropTypes.string,
+                isActive: PropTypes.bool,
+                gamesPlayed: PropTypes.number,
+            }
+        ))
+}
 
 export default connect(mapStateToProps)(PlayerList);

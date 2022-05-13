@@ -1,10 +1,3 @@
-class Player {
-    constructor(name) {
-        this.name = name;
-        this.gamesPlayed = 0;
-    }
-}
-
 class DoublesTeam {
     constructor(players) {
         this.players = new Set(players);

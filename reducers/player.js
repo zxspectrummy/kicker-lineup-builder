@@ -1,17 +1,29 @@
-const initialState = ['Alfa', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf']
+import {v4 as uuidv4} from 'uuid';
+
+const playerFromName = (name) => {
+    return {
+        name: name,
+        id: uuidv4(),
+        gamesPlayed: 0,
+        isActive: true
+    }
+}
+const defaultNames = ['Alfa', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf']
+const playersById = defaultNames.map(name => playerFromName(name));
+const initialState = playersById;
 
 const player = (state = initialState, action) => {
     switch (action.type) {
         case 'NEW_PLAYER':
-            return [...state, '']
-        case 'UPDATE_PLAYER':
-            return [
-                ...state.slice(0, action.index),
-                action.payload,
-                ...state.slice(action.index + 1)
-            ]
+            return [...state, playerFromName('')]
+        case 'UPDATE_PLAYER_NAME':
+            return state.map((player) => player.id === action.index ? {...player, name: action.payload} : player)
+
+        case 'UPDATE_PLAYER_STATE':
+            return state.map((player) => player.id === action.index ? {...player, isActive: action.payload} : player)
+
         case 'DELETE_PLAYER':
-            return [...state.filter((_player, index) => index !== action.index)]
+            return [...state.filter((player) => player.id !== action.index)]
         default:
             return state
     }

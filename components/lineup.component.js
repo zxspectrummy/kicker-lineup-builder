@@ -18,9 +18,8 @@ const renderOption = (props) => {
 
 const TeamPicker = (props) => {
     const commaSeparatedPlayerList = () => {
-        return props.selectedIndex.map(index => props.players[index.row]).sort().join(', ');
+        return props.selectedIndex.map(index => props.players[index.row].name).sort().join(', ');
     }
-
     return <Select
         placeholder={props.label}
         style={styles.row}
@@ -28,9 +27,10 @@ const TeamPicker = (props) => {
         multiSelect={true}
         selectedIndex={props.selectedIndex}
         onSelect={props.onSelect}
-        value={commaSeparatedPlayerList()}>
-        {props.players && props.players.map((player, index) => renderOption({
-            title: player, key: index, disabled: props.selectedIndex.length >= 2
+        value={commaSeparatedPlayerList()}
+    >
+        {props.players && props.players.map((player) => renderOption({
+            title: player.name, key: player.id, disabled: props.selectedIndex.length >= 2
         }))}
     </Select>
 }
@@ -38,12 +38,18 @@ const TeamPicker = (props) => {
 TeamPicker.propTypes = {
     selectedIndex: PropTypes.arrayOf(PropTypes.any),
     onSelect: PropTypes.func,
-    players: PropTypes.arrayOf(PropTypes.any),
+    players: PropTypes.arrayOf(
+        PropTypes.shape({
+                id: PropTypes.string,
+                name: PropTypes.string,
+                isActive: PropTypes.bool,
+                gamesPlayed: PropTypes.number,
+            }
+        )),
     label: PropTypes.string,
 };
 const LineupComponent = () => {
-    const players = useSelector(store => store.players);
-
+    const players = useSelector(store => store.players.filter(player => player.isActive));
     const lineup = new Lineup(players);
     const teams = lineup.getAllPairs();
     const [singlesIndex, setSinglesIndex] = useState([]);
@@ -74,7 +80,8 @@ const LineupComponent = () => {
             <Card>
                 <TeamPicker selectedIndex={doubles3Index}
                             onSelect={index => setDoubles3Index(index)}
-                            players={players.filter((_, i) => !doubles4Index.map(i => i.row).includes(i))}
+                    //players={players.filter((_, i) => !doubles4Index.map(i => i.row).includes(i))}
+                            players={players}
                             label='Doppel 3 (D3)'/>
                 <TeamPicker selectedIndex={doubles4Index}
                             onSelect={(index) => {
