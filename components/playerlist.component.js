@@ -59,7 +59,7 @@ const PlayerList = (props) => {
                     />
                     <Button
                         style={styles.button}
-                        appearance='ghost'
+                        appearance='outline'
                         onPress={() => deleteHandler(player.id)}
                         accessoryLeft={DeletePlayerIcon}
                         status='danger'

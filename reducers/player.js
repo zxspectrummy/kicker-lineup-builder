@@ -6,7 +6,7 @@ const playerFromName = (name) => {
         name: name,
         id: uuidv4(),
         gamesPlayed: 0,
-        isActive: true
+        isActive: true,
     }
 }
 const defaultNames = ['Alfa', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf']
