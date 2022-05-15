@@ -3,6 +3,7 @@ import {connect, useDispatch} from 'react-redux';
 import {Card, IndexPath, Select, SelectItem, Text} from '@ui-kitten/components';
 import * as PropTypes from "prop-types";
 import {useRef} from "react";
+import {createSelector} from "reselect";
 
 const renderOption = (props) => {
     const hint = (props) => (
@@ -31,10 +32,6 @@ const TeamPicker = (props) => {
     }
     const selectedIndex = playerIdsToSelectedIndex(props.team);
 
-    const lastSelectedPlayerId = (selectedIndex, team) => {
-        let playerIds = selectedIndexToPlayerIds(selectedIndex);
-        return playerIds.filter(x => !team.includes(x)).concat(team.filter(x => !playerIds.includes(x)))[0];
-    }
     const select = useRef(null)
     return <Select
         ref={select}
@@ -49,14 +46,9 @@ const TeamPicker = (props) => {
             }
             if ((props.team.length < 2) || (selectedIndex.length < props.team.length)) {
                 dispatch({
-                    type: 'UPDATE_TEAM',
+                    type: 'LINEUP_UPDATE_TEAM',
                     team: props.teamKey,
                     payload: selectedIndexToPlayerIds(selectedIndex)
-                })
-                dispatch({
-                    type: 'UPDATE_PLAYER_GAMES_PLAYED',
-                    index: lastSelectedPlayerId(selectedIndex, props.team),
-                    payload: selectedIndex.length - props.team.length
                 })
             }
         }}
@@ -64,7 +56,8 @@ const TeamPicker = (props) => {
         {props.players && props.players.map((player) => renderOption({
             title: player.name,
             key: player.id,
-            disabled: (selectedIndex.length >= 2 && !props.team.includes(player.id)),
+            disabled: (props.team.length >= 2 && !props.team.includes(player.id)),
+            isSelected: props.team.includes(player.id),
             gamesPlayed: player.gamesPlayed
         }))}
     </Select>
@@ -84,9 +77,21 @@ TeamPicker.propTypes = {
     label: PropTypes.string,
 };
 
+const addGamesPlayed = (players, lineup) => {
+    const allGames = Object.keys(lineup).map((key) => lineup[key]).flat(1)
+    return players.map(player => ({
+        ...player,
+        gamesPlayed: allGames.reduce((a, v) => (v === player.id ? a + 1 : a), 0)
+    }));
+}
+
+const resultSelector = createSelector(
+    [state => state.players, state => state.lineup],
+    addGamesPlayed
+);
 const mapStateToProps = (state) => {
     const activePlayers = () => {
-        return state.players.filter(player => player.isActive);
+        return resultSelector(state).filter(player => player.isActive);
     }
 
     const playersAllowedPlayedClosingRounds = (team) => {
@@ -107,7 +112,7 @@ const mapStateToProps = (state) => {
 
     const filterByGamesPlayed = (team) => {
         return activePlayers().filter(player => player.gamesPlayed < 3)
-            .concat(activePlayers().filter(player => team.includes(player.id) && player.gamesPlayed == 3));
+            .concat(activePlayers().filter(player => team.includes(player.id) && player.gamesPlayed === 3));
     }
 
     return {
@@ -122,7 +127,7 @@ const mapStateToProps = (state) => {
 }
 const LineupComponent = (props) => {
     return (
-        <View style={[styles.container]}>
+        <View>
             <Card>
                 <TeamPicker team={props.lineup.doubles1}
                             teamKey='doubles1'
@@ -167,6 +172,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 10,
+        flexDirection: 'row'
     },
     teamGroup: {
         padding: 10,

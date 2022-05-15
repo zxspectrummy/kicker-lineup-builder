@@ -22,23 +22,23 @@ const PlayerList = (props) => {
     }
 
     const deleteHandler = (key) => {
-        dispatch({type: 'DELETE_PLAYER', index: key});
+        dispatch({type: 'DELETE_PLAYER', playerId: key});
     }
 
     const inputHandler = (name, key) => {
-        dispatch({type: 'UPDATE_PLAYER_NAME', index: key, payload: name});
+        dispatch({type: 'UPDATE_PLAYER_NAME', playerId: key, payload: name});
     }
 
     const stateHandler = (isActive, key) => {
         dispatch({
             type: 'UPDATE_PLAYER_STATE',
-            index: key,
+            playerId: key,
             payload: isActive
         })
         if (isActive === false) {
             dispatch({
                 type: 'UPDATE_ACTIVE_PLAYERS',
-                index: key
+                playerId: key
             })
         }
     }
@@ -50,6 +50,8 @@ const PlayerList = (props) => {
                         style={styles.toggle}
                         checked={player.isActive}
                         onChange={(isActive) => stateHandler(isActive, player.id)}
+                        size='small'
+                        style={{marginHorizontal: 2}}
                     />
                     <Input
                         style={styles.input}
@@ -59,10 +61,11 @@ const PlayerList = (props) => {
                     />
                     <Button
                         style={styles.button}
-                        appearance='outline'
+                        appearance='ghost'
                         onPress={() => deleteHandler(player.id)}
                         accessoryLeft={DeletePlayerIcon}
                         status='danger'
+                        size='small'
                     />
                 </View>
             ))}

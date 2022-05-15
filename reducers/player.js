@@ -5,7 +5,6 @@ const playerFromName = (name) => {
     return {
         name: name,
         id: uuidv4(),
-        gamesPlayed: 0,
         isActive: true,
     }
 }
@@ -18,19 +17,13 @@ const player = (state = initialState, action) => {
             return [...state, playerFromName('')]
 
         case 'UPDATE_PLAYER_NAME':
-            return state.map((player) => player.id === action.index ? {...player, name: action.payload} : player)
+            return state.map((player) => player.id === action.playerId ? {...player, name: action.payload} : player)
 
         case 'UPDATE_PLAYER_STATE':
-            return state.map((player) => player.id === action.index ? {...player, isActive: action.payload} : player)
-
-        case 'UPDATE_PLAYER_GAMES_PLAYED':
-            return state.map((player) => player.id === action.index ? {
-                ...player,
-                gamesPlayed: player.gamesPlayed + action.payload
-            } : player)
+            return state.map((player) => player.id === action.playerId ? {...player, isActive: action.payload} : player)
 
         case 'DELETE_PLAYER':
-            return [...state.filter((player) => player.id !== action.index)]
+            return [...state.filter((player) => player.id !== action.playerId)]
         default:
             return state
     }
