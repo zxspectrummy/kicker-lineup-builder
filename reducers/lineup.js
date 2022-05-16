@@ -1,32 +1,76 @@
 const initialState = {
-    singles: [],
-    doubles1: [],
-    doubles2: [],
-    doubles3: [],
-    doubles4: [],
-    doubles5: [],
+    games: {
+        doubles1: [],
+        doubles2: [],
+        singles: [],
+        doubles3: [],
+        doubles4: [],
+        doubles5: [],
+    },
+    substitutions: {
+        available: [],
+        broughtIn: [],
+        broughtOut: []
+    },
 }
+
 const lineup = (state = initialState, action) => {
+    const arrayToObject = (array) =>
+        array.reduce((obj, item) => {
+            obj[item[0]] = item[1]
+            return obj
+        }, {})
+
     switch (action.type) {
         case 'LINEUP_RESET':
             return {
                 ...initialState
             }
         case 'LINEUP_UPDATE_TEAM':
+            if (action.team === 'substitutions')
+                return {
+                    ...state,
+                    substitutions: {
+                        ...state.substitutions,
+                        available: action.payload
+                    }
+                }
             return {
                 ...state,
-                [action.team]: action.payload,
+                games: {
+                    ...state.games,
+                    [action.team]: action.payload,
+                }
             }
-        case 'UPDATE_ACTIVE_PLAYERS':
+        case 'LINEUP_SUBSTITUTE_PLAYER': {
+            const startingIndex = Object.keys(state.games).indexOf(action.currentGame);
+            const gamesArray = Object.keys(state.games).map((key) => [key, state.games[key]])
+            const gamesArrayReplaced = gamesArray
+                .map((game, index) => {
+                    if (index >= startingIndex)
+                        return [game[0], game[1].map(g => g === action.currentPlayerId ? action.playerId : g)]
+                    else
+                        return [game[0], game[1]]
+                })
             return {
                 ...state,
-                singles: state.singles.filter((id) => id !== action.playerId),
-                doubles1: state.doubles1.filter((id) => id !== action.playerId),
-                doubles2: state.doubles2.filter((id) => id !== action.playerId),
-                doubles3: state.doubles3.filter((id) => id !== action.playerId),
-                doubles4: state.doubles4.filter((id) => id !== action.playerId),
-                doubles5: state.doubles5.filter((id) => id !== action.playerId),
+                games: arrayToObject(gamesArrayReplaced, 0),
+                substitutions: {
+                    available: state.substitutions.available.filter(playerId => playerId !== action.playerId),
+                    broughtIn: [...state.substitutions.broughtIn, action.playerId],
+                    broughtOut: [...state.substitutions.broughtOut, action.currentPlayerId]
+                },
             }
+        }
+
+        case 'UPDATE_ACTIVE_PLAYERS': {
+            const gamesArray = Object.keys(state.games).map((key) => [key, state.games[key]]);
+            const gamesFiltered = gamesArray.map(game => [game[0], game[1].filter(g => g !== action.playerId)])
+            return {
+                ...state,
+                games: arrayToObject(gamesFiltered, 0)
+            }
+        }
         default:
             return state
     }
